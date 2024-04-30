@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#" style="display: inline-block;">
+            <img src="/static/img/youtube-icon.png" alt="" width="50" style="display: inline-block;">
+            <p style="font-weight: bold; display: inline-block; font-size: 150;">YouMusic</p>
+            </a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#"
+                  >Introduce</a
+                >
+              </li>
+            </ul>
+          </div>
+
+            {% if username %}
+              <p style="padding-right: 20px;
+              padding-top: 15px;">Hi, {{ username }}!</p>
+              <form action="/logout" method="post">
+                <button class="btn btn-primary" id="logout-btn" type="submit">Đăng xuất</button>
+              </form>
+            {% else %}
+              <button class="btn btn-primary" id="login-btn">
+                Đăng nhập
+              </button>
+            {% endif %} 
+            
+        </div>
+      </nav>
+    </header>
+    <main class="container mt-5">
+      <h1 class="text-center mb-4">
+        <img src="/static/img/youtube-icon.png" width="100" alt="">
+        YouMusic Search</h1>
+      <div id="play_bar" class="fixed d-flex justify-content-center"></div>
+      <form action="/search" method="post">
+        <div class="row">
+          <div class="col-11">
+            <input
+              class="form-control"
+              type="text"
+              name="query"
+              placeholder="Enter search..."
+            />
+          </div>
+          <div class="col-1">
+            <button class="btn btn-primary" type="submit">Search</button>
+          </div>
+        </div>
+      </form>
+      <div style="display: flex; gap: 10px;">
+        <form action="/trending" method="post">
+          <button class="btn btn-primary mt-3 {% if request.path == '/trending' %}btn-selected{% endif %} " type="submit" >Trending</button>
+        </form>
+        <form action="/favorite" method="post">
+          <button class="btn btn-primary mt-3 {% if request.path == '/favorite' %}btn-selected{% endif %}" type="submit">Danh sách yêu thích</button>
+        </form>
+        <form action="/history" method="post">
+          <button class="btn btn-primary mt-3 {% if request.path == '/history' %}btn-selected{% endif %} " type="submit">Danh sách đã nghe</button>
+        </form>
+
+      </div>
+      {% if request.path == '/history' %}
+
+        <form action="/delete_history" method="post">
+          <button type="submit" class="btn btn-danger" id="btn-delete-history">Xóa tất cả</button>
+        </form>
+
+      {% endif %}
+      <article class="mt-5">
+        <div class="row row-cols-3">
+          {% for song in songs %}
+          <div class="col mb-4">
+            <div
+              class="mb-2 song-container"
+              onclick="playSong('{{ song.id }}', '{{ song.audioUrl }}', '{{ song.thumbnail }}', '{{ song.title }}', '{{ song.artist }}')"
+            >
+              <img
+                src="{{ song.thumbnail }}"
+                width="100%"
+                alt="{{ song.title }}"
+                class="rounded-3"
+              />
+            </div>
+            <input type="hidden" name="songId" value="{{ song.id }}" />
+            <p>{{ song.title }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </article>
+    </main>
+    <footer class="footer">
+
+    </footer>
+    <div class="music-player">
+      <div class="music-player__info">
+        <div class="img-container">
+          <img
+            src="/static/img/youtube-icon.png"
+            alt=""
+            id="song-img"
+          />
+        </div>
+        <div class="info-container">
+          <div id="song-title">Name:</div>
+          <strong id="song-channel">Singer:</strong>
+        </div>
+      </div>
+      <div class="music-player__controller">
+        <div class="control-btn">
+          <button class="repeat-btn">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              fill="currentColor"
+              class="bi bi-repeat"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M11 5.466V4H5a4 4 0 0 0-3.584 5.777.5.5 0 1 1-.896.446A5 5 0 0 1 5 3h6V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m3.81.086a.5.5 0 0 1 .67.225A5 5 0 0 1 11 13H5v1.466a.25.25 0 0 1-.41.192l-2.36-1.966a.25.25 0 0 1 0-.384l2.36-1.966a.25.25 0 0 1 .41.192V12h6a4 4 0 0 0 3.585-5.777.5.5 0 0 1 .225-.67Z"
+              />
+            </svg>
+          </button>
+          <button class="pre-song-btn">
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              class="bi bi-skip-start-fill"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M4 4a.5.5 0 0 1 1 0v3.248l6.267-3.636c.54-.313 1.232.066 1.232.696v7.384c0 .63-.692 1.01-1.232.697L5 8.753V12a.5.5 0 0 1-1 0z"
+              />
+            </svg>
+          </button>
+          <button class="play-btn">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="30"
+              height="30"
+              fill="currentColor"
+              class="bi bi-play-circle-fill"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814z"
+              />
+            </svg>
+          </button>
+          
+          <button class="next-song-btn">
+            <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="currentColor"
+            class="bi bi-skip-end-fill"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M12.5 4a.5.5 0 0 0-1 0v3.248L5.233 3.612C4.693 3.3 4 3.678 4 4.308v7.384c0 .63.692 1.01 1.233.697L11.5 8.753V12a.5.5 0 0 0 1 0z"
+            />
+          </svg>
+          </button>
+          <button class="auto-move-btn">
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              fill="currentColor"
+              class="bi bi-shuffle"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.6 9.6 0 0 0 7.556 8a9.6 9.6 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.6 10.6 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.6 9.6 0 0 0 6.444 8a9.6 9.6 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5"
+              />
+              <path
+                d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192"
+              />
+            </svg>
+          </button>
+          <div class="add-favorite-list">
+
+            <button class="add-favorite-list-btn" onclick="toggleFavorite(CurrentsongId)">
+              <svg xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              class="bi bi-heart-fill favorite-icon"
+               viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/>
+              </svg>
+            </button>
+          </div>
+
+          
+        </div>
+        
+        <div class="progress-container">
+          <span id="current-time">0:00</span>
+          <div class="progress-bar">
+            <input
+              type="range"
+              class="timeline"
+              max="100"
+              value="0"
+              step="0.1"
+              class="timeline"
+            />
+          </div>
+          <div class="progress-button"></div>
+          <span id="total-time">0:00</span>
+        </div>
+      </div>
+      
+      <div class="music-player__other" id="volume-control">
+
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="currentColor"
+          class="bi bi-volume-up-fill"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M11.536 14.01A8.47 8.47 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.48 7.48 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303z"
+          />
+          <path
+            d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.48 5.48 0 0 1 11.025 8a5.48 5.48 0 0 1-1.61 3.89z"
+          />
+          <path
+            d="M8.707 11.182A4.5 4.5 0 0 0 10.025 8a4.5 4.5 0 0 0-1.318-3.182L8 5.525A3.5 3.5 0 0 1 9.025 8 3.5 3.5 0 0 1 8 10.475zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06"
+          />
+        </svg>
+        <div class="volume-slider">
+          <input
+            type="range"
+            class="volume-range"
+            min="0"
+            max="1"
+            step="0.1"
+            value="1"
+          />
+        </div>
+      
+
+        <button class="download-btn" type="button" id="downloadButton" >
+
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="currentColor"
+            class="bi bi-download"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"
+            />
+            <path
+              d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"
+            />
+          </svg>
+        </button>
+    
+        
+      </div>
+    </div>
+    <audio hidden controls autoplay id="audio_player">
+      <source src="{{ audioUrl }}" type="audio/mp3" />
+    </audio>
+
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const timeline = document.querySelector(".timeline");
+      const currentTimeSpan = document.getElementById("current-time");
+      const totalTimeSpan = document.getElementById("total-time");
+      const audio = document.querySelector("audio");
+      const volumeControl = document.getElementById("volume-control");
+      const volumeRange = document.querySelector(".volume-range");
+      const playButton = document.querySelector(".play-btn");
+      const nextSongButton = document.querySelector(".next-song-btn");
+      const preSongButton = document.querySelector(".pre-song-btn");
+      const repeatButton = document.querySelector(".repeat-btn");
+      const autoMoveButton = document.querySelector(".auto-move-btn");
+      const playIcon = ` <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="30"
+            height="30"
+            fill="currentColor"
+            class="bi bi-play-circle-fill"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814z"
+            />
+          </svg>`;
+
+      const pauseIcon = ` <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="30"
+          height="30"
+          fill="currentColor"
+          class="bi bi-pause-circle-fill"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.25 5C5.56 5 5 5.56 5 6.25v3.5a1.25 1.25 0 1 0 2.5 0v-3.5C7.5 5.56 6.94 5 6.25 5m3.5 0c-.69 0-1.25.56-1.25 1.25v3.5a1.25 1.25 0 1 0 2.5 0v-3.5C11 5.56 10.44 5 9.75 5"
+          />
+        </svg>`;
+
+      function toggleAudio() {
+        if (audio.paused) {
+          audio.play();
+          playButton.innerHTML = pauseIcon;
+        } else {
+          audio.pause();
+          playButton.innerHTML = playIcon;
+        }
+      }
+
+      playButton.addEventListener('click', toggleAudio);
+
+      let baseSongUrl = 'https://www.youtube.com/watch?v=';
+      let currentSongUrl = '';
+
+      let CurrentsongId ='';
+
+      function playSong(songId, audioUrl, thumbnail, title, artist) {
+
+        document.getElementById("audio_player").src = audioUrl;
+        document.getElementById("audio_player").play();
+        document.getElementById("song-title").textContent = title;
+        document.getElementById("song-channel").textContent = artist;
+        document.getElementById("song-img").src = thumbnail;
+        document.getElementById("song-img").alt = title;
+        currentSongUrl = baseSongUrl + songId;
+        CurrentsongId = songId;
+        playButton.innerHTML = pauseIcon;
+        savePlayedSong(songId, function() {
+        // Sau khi dữ liệu được lưu thành công, kiểm tra yêu thích
+          checkFavorite(songId);
+        });
+      }
+
+      function changeSeek() {
+        const time = (timeline.value * audio.duration) / 100;
+        audio.currentTime = time;
+      }
+      timeline.addEventListener("change", changeSeek);
+
+      // Cập nhật thời gian hiện tại và tổng thời lượng của audio
+      audio.addEventListener("timeupdate", () => {
+        const currentTime = formatTime(audio.currentTime);
+        const totalTime = formatTime(audio.duration);
+        currentTimeSpan.textContent = currentTime;
+        totalTimeSpan.textContent = totalTime;
+
+        // Cập nhật giá trị của thanh trượt
+        const progress = (audio.currentTime / audio.duration) * 100;
+        timeline.value = progress;
+      });
+
+      // Hàm chuyển đổi giây thành định dạng mm:ss
+      function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes}:${
+          remainingSeconds < 10 ? "0" : ""
+        }${remainingSeconds}`;
+      }
+
+      // Chuyển bài hát kế tiếp
+      let songContainers = document.querySelectorAll(".song-container");
+      for (let i = 0; i < songContainers.length; i++) {
+          songContainers[i].addEventListener("click", () => {
+              currentSongIndex = i;
+          });
+      }
+      nextSongButton.addEventListener("click", () => {
+            currentSongIndex = (currentSongIndex + 1) % songContainers.length;
+            songContainers[currentSongIndex].click();
+      });
+
+      // Chuyển bài hát trước đó
+      preSongButton.addEventListener("click", () => {
+          currentSongIndex = (currentSongIndex - 1 + songContainers.length) % songContainers.length;
+          songContainers[currentSongIndex].click();
+      });
+
+      // Lặp lại bài hát
+      let isLooping = false;
+      const svgElement = repeatButton.querySelector("svg");
+      repeatButton.addEventListener("click", () => {
+          isLooping = !isLooping;
+          audio.loop = isLooping;
+          if (isLooping) {
+            autoMoveButton.querySelector("svg").style.fill = "black";
+            svgElement.style.fill = "green";
+          } else {
+            svgElement.style.fill = "black";
+          }
+      });
+
+      // Tự động chuyển sang bài hát khác
+      
+      let isAutoMove = false;
+      const svgE = autoMoveButton.querySelector("svg");
+      autoMoveButton.addEventListener("click", () => {
+          isAutoMove = !isAutoMove;
+          if (isAutoMove) {
+            audio.loop = false;
+            repeatButton.querySelector("svg").style.fill = "black";
+            svgE.style.fill = "green";
+          } else {
+            svgE.style.fill = "black";
+          }
+      });
+
+      audio.addEventListener("ended", () => {
+        if (isAutoMove) {
+          nextSongButton.click();
+        }
+      });
+
+
+
+
+      volumeRange.addEventListener("input", () => {
+        audio.volume = volumeRange.value;
+      });
+
+
+      // Tải bài hát
+      document.getElementById("downloadButton").addEventListener("click", function() {
+        var songUrl = currentSongUrl;
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/download", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                alert("Tải bài hát thành công!");
+            }
+        };
+        xhr.send("songUrl=" + encodeURIComponent(songUrl));
+    });
+
+    document.getElementById("login-btn").addEventListener("click", function() {
+      window.location.href = "/login_page";
+
+    });
+
+    function toggleFavorite(songId) {
+
+      if (!checkLoginStatus()) {
+        window.location.href = "/login_page";
+        
+        return;
+      }
+      var favoriteButton = document.querySelector('.add-favorite-list-btn');
+      var favoriteIcon = favoriteButton.querySelector('.favorite-icon'); // Lấy thẻ SVG trong nút
+
+      var isFavorite = favoriteButton.classList.contains('favorite');
+
+      // Gửi yêu cầu AJAX để thêm hoặc xóa bài hát khỏi danh sách yêu thích
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/toggle_favorite', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onload = function () {
+          if (xhr.status === 200) {
+              // Cập nhật trạng thái của nút dựa trên phản hồi từ máy chủ
+              if (isFavorite) {
+                  favoriteButton.classList.remove('favorite');
+                  favoriteIcon.classList.remove('favorite-icon-selected'); // Loại bỏ class
+              } else {
+                  favoriteButton.classList.add('favorite');
+                  favoriteIcon.classList.add('favorite-icon-selected'); // Thêm class
+              }
+              checkFavorite(songId);
+
+          }
+      };
+      xhr.send(JSON.stringify({ songId: songId }));
+    }
+    function checkFavorite(songId) {
+        var favoriteButton = document.querySelector('.add-favorite-list-btn');
+        var favoriteIcon = favoriteButton.querySelector('.favorite-icon'); // Lấy thẻ SVG trong nút
+
+        // Gửi yêu cầu AJAX để kiểm tra trạng thái yêu thích của bài hát
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/check_favorite', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                var isFavorite = JSON.parse(xhr.responseText).isFavorite;
+                // Nếu bài hát đã được lưu trong danh sách yêu thích, tô màu cho nút
+                if (isFavorite) {
+                    favoriteIcon.classList.add('favorite-icon-selected'); // Thêm class
+                    
+                }
+                else {
+                    favoriteIcon.classList.remove('favorite-icon-selected'); // Loại bỏ class
+                }
+            }
+        };
+        xhr.send(JSON.stringify({ songId: songId }));
+    }
+
+          function checkLoginStatus() {
+            var loggedIn = false;
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/check_login', false);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    loggedIn = JSON.parse(xhr.responseText).loggedIn;
+                }
+            };
+            xhr.send();
+            return loggedIn;
+        }
+        function savePlayedSong(songId, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/save_played_song', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                console.log('Bài hát đã được lưu vào cơ sở dữ liệu.');
+                // Gọi hàm gọi lại (callback) sau khi lưu thành công
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            } else {
+                console.error('Đã xảy ra lỗi khi lưu bài hát vào cơ sở dữ liệu.');
+            }
+        }
+    };
+    xhr.send('songId=' + encodeURIComponent(songId));
+}
+
+document.getElementById("btn-delete-history").addEventListener("click", function() {
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/delete_history', true);
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.onreadystatechange = function() {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+          // if (xhr.status === 200) {
+          //     // alert('Đã xóa tất cả bài hát đã nghe.');
+          //     // window.location.reload();
+          // } else {
+          //     alert('Đã xảy ra lỗi khi xóa bài hát đã nghe.');
+          // }
+      }
+  };
+  xhr.send();
+});
+
+
+
+    </script>
+  </body>
+</html>

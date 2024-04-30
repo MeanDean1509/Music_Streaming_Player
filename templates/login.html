@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Page</title>
+    <style>
+        /* Add your custom CSS styles here */
+        body {
+            display: block;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+           
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        :root {
+            --black--color: #000;
+            --white--color: #fff;
+            --blue--color: #27d9ed;
+            --gray--color: #aaaaaa;
+        }
+        h1 {
+            color: var(--black--color);
+            margin-top: 130px;
+         
+        }
+        div{
+            
+            border-radius: 10px;
+        }
+        form {
+            display:inline-block;
+            margin-top: 10px;
+            width: 300px;
+            background-color: var(--white--color);
+            padding: 10px 30px 30px;
+            
+            border-radius: 10px;
+            
+           
+        }
+        form input {
+            padding-left: 10px;
+            margin-bottom: 10px;
+            height: 45px;
+            width: 96%;
+            border: 1px solid #000;
+            outline: none;
+            border-radius: 10px;
+        }
+        form button {
+            padding: 8px 15px;
+            border: none;
+            outline: none;
+            border-radius: 5px;
+            background: var(--black--color);
+            color: #fff;
+            transition: all 0.2s linear;
+            cursor: pointer;
+        }
+        form button:hover {
+            transform: scale(1.1);
+        }
+        form input:focus {
+            border: 2px solid var(--black--color);
+        }
+        form input::placeholder {
+            color: black;
+        }
+        form p {
+            margin-top: 20px;
+        }
+        form a {
+            color: var(--blue--color);
+        }
+
+        button {
+            padding: 8px 15px;
+            border: none;
+            outline: none;
+            border-radius: 5px;
+            background: var(--black--color);
+            color: #fff;
+            transition: all 0.2s linear;
+            cursor: pointer;
+        }
+
+
+
+    </style>
+
+</head>
+<body>
+    <h1>Login</h1>
+    <div style="border: 1px solid black; display: inline-block;">
+        <form action="/login" method="post">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    <p>Bạn chưa có tài khoản? <button id="signup-btn">Sign up</button></p>
+</body>
+<script>
+
+    // Add your custom JavaScript code here
+    document.getElementById('signup-btn').addEventListener('click', function() {
+        window.location.href = '/signup_page';
+    });
+    
+</script>
+</html>
