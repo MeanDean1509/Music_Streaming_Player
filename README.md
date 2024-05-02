@@ -30,3 +30,16 @@ YouMusic là một ứng dụng web đơn giản được phát triển bằng P
     ```bash
     pip install mysql-connector-python
     ```
+6. **Khởi chạy ứng dụng**:
+
+    ```bash
+    python app.py
+    ```
+
+## Sử Dụng
+
+- Truy cập vào trang web và tìm kiếm bài hát bằng cách nhập từ khóa vào ô tìm kiếm hoặc xem danh sách các bài hát phổ biến.
+- Đăng nhập hoặc đăng ký tài khoản để lưu danh sách yêu thích và lịch sử phát nhạc.
+- Phát nhạc trực tuyến từ YouTube và tải về bài hát yêu thích của bạn.
+- Thao tác với các nút điều khiển cơ bản của một web nghe nhạc
+- Xem lại lịch sử phát nhạc và quản lý danh sách yêu thích của bạn.
