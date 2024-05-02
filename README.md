@@ -1,6 +1,10 @@
 # Music_Streaming_Player
  Music Streaming Player
 
+## Giới thiệu
+
+Music Player từ YouTube là một ứng dụng web đơn giản được phát triển bằng Python và Flask, cho phép người dùng tìm kiếm và phát nhạc trực tuyến từ YouTube. Ứng dụng cũng cho phép người dùng đăng nhập, đăng ký tài khoản để lưu danh sách yêu thích và lịch sử phát nhạc.
+
  ## Cài Đặt
 
 Để sử dụng dự án này, bạn cần thực hiện các bước sau:
