@@ -47,7 +47,8 @@ def getInfoSong(id):
     video = YouTube(songUrl)
     bestAudio = video.streams.filter(only_audio=True).first()
     audioUrl = bestAudio.url
-    songInfo = Song(id, songResponse['title'], songResponse['channelTitle'], thumbnail_url, songUrl, audioUrl)
+    songInfo = Song(id, songResponse['title'],
+                    songResponse['channelTitle'], thumbnail_url, songUrl, audioUrl)
     return songInfo
 
 next_page_token = 'index'
@@ -110,7 +111,7 @@ def search():
             q=request.form['query'],
             part='snippet',
             type='video',
-            videoCategoryId='10',  
+            videoCategoryId='10',
             maxResults=6
         ).execute()
 
@@ -119,12 +120,12 @@ def search():
         for search_result in search_response.get('items', []):
             video_id = search_result['id']['videoId']
             song = getInfoSong(video_id)
-            songs.append(song)   
+            songs.append(song)
         global next_page_token
         next_page_token = 'index'
         return render_template_with_session('index.html', songs=songs)
-    
-    
+
+
 
 
 
@@ -261,9 +262,6 @@ def favorite():
             song_id = row[0]  # Lấy giá trị của cột id_song từ kết quả truy vấn
             song = getInfoSong(song_id)  # Truyền giá trị của cột id_song vào hàm getInfoSong
             songs.append(song)
-        
-        
-
         return render_template_with_session('index.html', songs=songs)
     else:
         return redirect(url_for('login_page'))
