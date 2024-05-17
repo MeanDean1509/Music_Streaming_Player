@@ -1,7 +1,7 @@
 # Music_Streaming_Player
  Music Streaming Player
 
-## File báo cáo: [Xem tại đây] (./Filebaocao/Filebaocao_Nhom13.pdf)
+## File báo cáo: [Xem tại đây](./Filebaocao/Filebaocao_Nhom13.pdf)
 
 ## Giới thiệu
 
